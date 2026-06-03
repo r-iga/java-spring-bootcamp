@@ -1,0 +1,11 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: rest-api-example
+
+logging:
+  level:
+    root: INFO
+    bootcamp: DEBUG
