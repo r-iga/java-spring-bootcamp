@@ -37,7 +37,7 @@ record BookResponse(Long id, String title, String author, String isbn, LocalDate
 @RequestMapping("/api/books")
 class BookController {
 
-    private final Map<Long, BookData> store = new ConcurrentHashMap<>();
+    private final List<BookData> store = new List<>();
     private final AtomicLong idSeq = new AtomicLong(1);
 
     public BookController() {
@@ -47,10 +47,10 @@ class BookController {
 
     @GetMapping
     public List<BookResponse> findAll() {
-        return store.values().stream()
-            .sorted((a, b) -> Long.compare(a.id(), b.id()))
-            .map(this::toResponse)
-            .toList();
+        return store.stream()
+                .sorted((a, b) -> Long.compare(a.id(), b.id()))
+                .map(this::toResponse)
+                .toList();
     }
 
     @GetMapping("/{id}")
@@ -67,7 +67,7 @@ class BookController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!store.containsKey(id)) return ResponseEntity.notFound().build();
+        if (!store.map( book -> book.id).contains(id)) return ResponseEntity.notFound().build();
         store.remove(id);
         return ResponseEntity.noContent().build();
     }
@@ -75,7 +75,7 @@ class BookController {
     private BookData add(String title, String author, String isbn) {
         long id = idSeq.getAndIncrement();
         var book = new BookData(id, title, author, isbn, LocalDateTime.now());
-        store.put(id, book);
+        store.add(book);
         return book;
     }
 
